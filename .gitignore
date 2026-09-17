@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# AWS credentials / secrets - never commit these
+.env
+*.pem
+credentials
+config
+
+# Local data output - contains account-specific identity info
+data/*.json
+!data/.gitkeep
+
+# OS
+.DS_Store
