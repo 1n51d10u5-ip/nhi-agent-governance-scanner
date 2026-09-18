@@ -4,7 +4,7 @@ A cloud security tool that inventories non-human identities (service accounts,
 access keys, AI agents) in an AWS account, flags excessive/unused permissions,
 scores blast radius, and detects behavioral anomalies in AI agent activity.
 
-## Status: Week 1 — Identity Inventory Engine
+## Status: Part 2 — Least-Privilege Diff & Risk Scoring
 
 ## Setup
 
@@ -45,14 +45,26 @@ This writes `data/identity_registry.json` — every IAM user and role, tagged
 by classification, with access key metadata and the full list of actions
 their attached policies grant.
 
-## Next up (Week 2)
+## Part 2: Risk scoring
 
-- Pull CloudTrail events for a lookback window
-- Diff actually-used actions against `granted_actions` from the registry
-- Flag unused permissions and compute a blast-radius risk score per identity
+Run after `inventory.py`:
 
-## Roadmap
+```
+python src/risk_scoring.py --days 7
+```
 
-See the project roadmap discussed with Claude for the full 4-week plan
-(inventory → least-privilege detection → agent instrumentation & anomaly
-detection → dashboard & packaging).
+This pulls CloudTrail activity, diffs it against each identity's granted
+actions, and computes a risk score. Key design decision: the score weights
+by **action risk tier** (critical / write / read), not raw action count —
+a broad managed policy like `ReadOnlyAccess` grants ~2,900 actions to a
+completely benign role, so counting alone is a meaningless signal. See the
+`CRITICAL_KEYWORDS` / `WRITE_KEYWORDS` heuristics in `risk_scoring.py`.
+
+Output: `data/risk_report.json`, ranked highest-risk-first.
+
+## Next up (Part 3)
+
+- Deploy a CrewAI agent with its own IAM identity and tool scope
+- Log every tool call the agent makes
+- Build behavioral anomaly detection (scope creep, burst rate, privilege
+  escalation), mapped to OWASP Agentic AI Top 10 / MITRE ATT&CK-ATLAS

@@ -1,18 +1,11 @@
 """
 Identity Inventory Engine
 --------------------------
-Week 1 deliverable for the NHI & AI Agent Access Governance Scanner.
 
 Enumerates every IAM user, role, and access key in an AWS account,
-classifies each as human / service / ai-agent, and writes a structured
+classifies as human/service/ai-agent, writes a structured
 JSON registry to data/identity_registry.json.
 
-Setup:
-    pip install -r requirements.txt
-    aws configure   # or set AWS_PROFILE / env vars for a sandbox account
-
-Run:
-    python src/inventory.py
 """
 
 import boto3
@@ -23,8 +16,8 @@ from pathlib import Path
 # ---- Configuration -------------------------------------------------
 
 # Naming conventions used to auto-classify identities. Adjust these to
-# match whatever tagging/naming scheme you use when you seed your
-# sandbox account with test identities.
+# match your tagging/naming scheme for identities in account.
+
 AI_AGENT_MARKERS = ["agent", "crewai", "bedrock-agent", "llm"]
 SERVICE_MARKERS = ["svc-", "service-", "-role", "lambda", "ci-", "deploy"]
 
